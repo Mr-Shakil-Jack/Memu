@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>শাকিল টেলিকম - ডিজিটাল মেমো</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background-color: #f4f6f9; padding: 15px; display: flex; justify-content: center; }
+        
+        .memo-box {
+            width: 100%;
+            max-width: 500px;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 2px solid #0056b3;
+        }
+        .header { text-align: center; margin-bottom: 20px; border-bottom: 2px dashed #0056b3; padding-bottom: 10px; }
+        .header h1 { color: #0056b3; font-size: 24px; }
+        .header p { color: #555; font-size: 13px; margin-top: 5px; }
+        
+        .info-input { display: flex; justify-content: space-between; margin-bottom: 15px; gap: 10px; }
+        .info-input input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
+
+        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        th { background: #0056b3; color: white; padding: 10px; font-size: 14px; text-align: center; }
+        td { padding: 8px; border-bottom: 1px solid #ddd; text-align: center; }
+        
+        /* ইনপুট ফিল্ড স্টাইল */
+        .p-name { width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; text-align: left; }
+        .p-input { width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; text-align: center; }
+        .total-clm { font-weight: bold; color: #333; }
+
+        .result-section { text-align: right; margin-top: 15px; font-size: 18px; font-weight: bold; color: #0056b3; }
+        
+        /* বাটন স্টাইল */
+        .btn-container { display: flex; gap: 10px; margin-top: 20px; }
+        .btn { flex: 1; padding: 12px; border: none; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; color: white; }
+        .add-btn { background-color: #28a745; }
+        .wa-btn { background-color: #25D366; display: flex; justify-content: center; align-items: center; gap: 8px; }
+    </style>
+</head>
+<body>
+
+<div class="memo-box">
+    <div class="header">
+        <h1>শাকিল টেলিকম</h1>
+        <p>মোবাইল এক্সেসরিজ ও ইলেকট্রনিক্স পাওয়া যায়</p>
+    </div>
+
+    <div class="info-input">
+        <input type="text" id="custName" placeholder="ক্রেতার নাম (ঐচ্ছিক)">
+        <input type="text" id="memoNo" placeholder="মেমো নং">
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 45%;">পণ্যের নাম</th>
+                <th style="width: 20%;">দর (৳)</th>
+                <th style="width: 15%;">qty</th>
+                <th style="width: 20%;">মোট</th>
+            </tr>
+        </thead>
+        <tbody id="memoBody">
+            <tr>
+                <td><input type="text" class="p-name" placeholder="যেমন: চার্জার"></td>
+                <td><input type="number" class="p-input price" oninput="calculateTotal()" placeholder="0"></td>
+                <td><input type="number" class="p-input qty" value="1" oninput="calculateTotal()"></td>
+                <td class="total-clm">0</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="result-section">
+        সর্বমোট: ৳ <span id="grandTotal">0</span>
+    </div>
+
+    <div class="btn-container">
+        <button class="btn add-btn" onclick="addRow()">➕ ঘর বাড়ান</button>
+        <button class="btn wa-btn" onclick="shareWhatsApp()">💬 WhatsApp শেয়ার</button>
+    </div>
+</div>
+
+<script>
+    // নতুন লাইনের ঘর তৈরি করার ফাংশন
+    function addRow() {
+        let tbody = document.getElementById("memoBody");
+        let tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td><input type="text" class="p-name" placeholder="পণ্যের নাম"></td>
+            <td><input type="number" class="p-input price" oninput="calculateTotal()" placeholder="0"></td>
+            <td><input type="number" class="p-input qty" value="1" oninput="calculateTotal()"></td>
+            <td class="total-clm">0</td>
+        `;
+        tbody.appendChild(tr);
+    }
+
+    // অটোমেটিক যোগ-গুণ করার ফাংশan
+    function calculateTotal() {
+        let rows = document.querySelectorAll("#memoBody tr");
+        let grandTotal = 0;
+
+        rows.forEach(row => {
+            let price = parseFloat(row.querySelector(".price").value) || 0;
+            let qty = parseFloat(row.querySelector(".qty").value) || 0;
+            let total = price * qty;
+            
+            row.querySelector(".total-clm").innerText = total;
+            grandTotal += total;
+        });
+
+        document.getElementById("grandTotal").innerText = grandTotal;
+    }
+
+    // হোয়াটসঅ্যাপে টেক্সট আকারে মেমো পাঠানোর ফাংশন
+    function shareWhatsApp() {
+        let custName = document.getElementById("custName").value || "সম্মানিত গ্রাহক";
+        let memoNo = document.getElementById("memoNo").value || "N/A";
+        let grandTotal = document.getElementById("grandTotal").innerText;
+        
+        let msg = `🧾 *শাকিল টেলিকম* \n`;
+        msg += `📱 মোবাইল এক্সেসরিজ ও ইলেকট্রনিক্স\n`;
+        msg += `-----------------------------------\n`;
+        msg += `👤 ক্রেতা: ${custName}\n`;
+        msg += `🔢 মেমো নং: ${memoNo}\n`;
+        msg += `-----------------------------------\n`;
+        
+        let rows = document.querySelectorAll("#memoBody tr");
+        rows.forEach((row, index) => {
+            let name = row.querySelector(".p-name").value;
+            let price = row.querySelector(".price").value;
+            let qty = row.querySelector(".qty").value;
+            let total = row.querySelector(".total-clm").innerText;
+            
+            if(name && price) {
+                msg += `${index + 1}. ${name} (${price} x ${qty}) = ${total} ৳\n`;
+            }
+        });
+        
+        msg += `-----------------------------------\n`;
+        msg += `💰 *সর্বমোট বিল: ${grandTotal} ৳*\n\n`;
+        msg += `🙏 আমাদের সাথে থাকার জন্য ধন্যবাদ!`;
+        
+        // হোয়াটসঅ্যাপের লিঙ্ক তৈরি
+        let whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+        window.open(whatsappUrl, '_blank');
+    }
+</script>
+
+</body>
+</html>
